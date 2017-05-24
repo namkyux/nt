@@ -10,7 +10,9 @@ const seedTodo = [{
 	text: "First test todo"
 }, {
 	_id: new ObjectID(),
-	text: "Second test todo"
+	text: "Second test todo",
+	completed: true,
+	completedAt: new Date().getTime()
 }, {
 	_id: new ObjectID(),
 	text: "Third test todo"
@@ -138,6 +140,50 @@ describe('DELETE /todos/:id', () => {
 			.delete(`/todos/${id}`)
 			.expect(404)
 			.end(done);
+	});
+});
+
+describe('PATCH /todos/:id', () => {
+	it('should update existing todo', (done) => {
+		//	grab id of first item
+		//	make patch request
+		//	update text, set completed to true;
+		//
+
+		var hexId = seedTodo[0]._id.toHexString();
+		var body = {
+			text: 'udpated',
+			completed: true
+		};
+		request(app)
+			.patch(`/todos/${hexId}`)
+			.send(body)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body.todo.text).toBe(body.text);
+				expect(res.body.todo.completed).toBe(true);
+				expect(res.body.todo.completedAt).toBeA('number');
+			})
+			.end(done);
+	});
+
+	it('should completedAt when todo is not completed', (done) => {
+		var hexId = seedTodo[1]._id.toHexString();
+		var body = {
+			text: 'udpated',
+			completed: false
+		};
+		request(app)
+			.patch(`/todos/${hexId}`)
+			.send(body)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body.todo.text).toBe(body.text);
+				expect(res.body.todo.completed).toBe(false);
+				expect(res.body.todo.completedAt).toNotExist();
+			})
+			.end(done);
+
 	});
 });
 
