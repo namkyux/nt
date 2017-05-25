@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
 	// console.log(req.body);
-	var todo = Todo({
+	var todo = new Todo({
 		text: req.body.text
 	});
 	todo.save().then((doc) => {
@@ -100,7 +100,25 @@ app.patch('/todos/:id', (req, res) => {
 	});
 });
 
-// app.get('/todos/1231')
+//	POST /users
+app.post('/users', (req, res) => {
+	User.remove({}, () => {
+		
+	});
+
+	var body = _.pick(req.body, ['email', 'password']);
+	var user = new User(body);
+
+	user.save().then(() => {
+		return user.generateAuthToken();
+	}).then((token) => {
+		console.log(token);
+		res.header('x-auth', token).send(user);
+	}).catch((e) => {
+		res.status(400).send(e);
+	});
+});
+
 
 app.listen(port, () => {
 	console.log(`Listening on port ${port}`);
